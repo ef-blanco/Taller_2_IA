@@ -47,7 +47,6 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     
     
     
-    return None
 
 # =============================== EMMANUEL ======================================
 
@@ -71,9 +70,11 @@ def backtrack(csp:DroneAssignmentCSP, asignacion:dict) -> dict[str,str] | None:
           if resultado is not None:
             return resultado
           # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
-          csp.unassign(variable,valor,asignacion)
+          csp.unassign(variable,asignacion)
       # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
       return None
+    
+# ===================================================================================
 
 def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
