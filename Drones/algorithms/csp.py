@@ -34,7 +34,10 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     
     # =============================== EMMANUEL ======================================
     
+    asignacion = {}
     
+    return backtrack(csp,asignacion)
+            
     
     # =============================== CATALINA ======================================
     
@@ -46,6 +49,31 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     
     return None
 
+# =============================== EMMANUEL ======================================
+
+def backtrack(csp:DroneAssignmentCSP, asignacion:dict) -> dict[str,str] | None:
+      if csp.is_complete(asignacion):
+        return asignacion
+      
+      variables = csp.get_unassigned_variables(asignacion)
+      # Obtenemos la primera variables sin asignar
+      variable = variables[0]
+      # Se obtienen los valores que puede tomar la variable seleccionada
+      valores_var = csp.domains[variable]
+      # Vamos porbando con distintos valores
+      for valor in valores_var:
+        # Primero vemos si el valor es consistente con las restricciones
+        if csp.is_consistent(variable,valor,asignacion):
+          # Si es consistente asignamos el valor y ahora miramos si nos lleva a un buen resultado
+          csp.assign(variable,valor,asignacion)
+          resultado = backtrack(csp,asignacion)
+          # Si el resultado nos dio una respuesta la retornamos
+          if resultado is not None:
+            return resultado
+          # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
+          csp.unassign(variable,valor,asignacion)
+      # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
+      return None
 
 def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
