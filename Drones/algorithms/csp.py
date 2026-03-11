@@ -26,30 +26,10 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
     # TODO: Implement your code here
     
-    # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-    # =============================== MICHELLE ======================================
-    
-    
-    
-    # =============================== EMMANUEL ======================================
-    
     asignacion = {}
     backtracks = 0
     
     return backtrack(csp,asignacion,backtracks)
-            
-    
-    # =============================== CATALINA ======================================
-    
-    
-    
-    # =============================== JUAN ESTEBAN ==================================
-    
-    
-    
-
-# =============================== EMMANUEL ======================================
 
 def backtrack(csp:DroneAssignmentCSP, asignacion:dict, backtracks:int) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
@@ -77,8 +57,6 @@ def backtrack(csp:DroneAssignmentCSP, asignacion:dict, backtracks:int) -> dict[s
         backtracks+=1
       # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
       return None
-    
-# ===================================================================================
 
 def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
@@ -93,14 +71,6 @@ def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     - Forward checking reduces the search space by detecting failures earlier than basic backtracking.
     """
     # TODO: Implement your code here
-      
-    # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-    # =============================== MICHELLE ======================================
-    
-    
-    
-    # =============================== EMMANUEL ======================================
     
     asignacion = {}
     backtracks = 0
@@ -109,15 +79,7 @@ def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
       dominios[var] = csp.domains[var]
     
     return backtrack_plus_fc(csp,asignacion,backtracks,dominios)
-    
-    # =============================== CATALINA ======================================
-    
-    
-    
-    # =============================== JUAN ESTEBAN ==================================
-    
 
-# =============================== EMMANUEL ======================================
 
 def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, backtracks:int, dominios:dict[str,list]) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
@@ -165,8 +127,6 @@ def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, backtracks:int, d
       # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
       return None
     
-# =========================================================================
-
 def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
     Backtracking search with AC-3 arc consistency.
@@ -184,23 +144,6 @@ def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
       - a backtrack function that integrates AC-3 into the search process.
     """
     # TODO: Implement your code here
-      
-    # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-    # =============================== MICHELLE ======================================
-    
-    
-    
-    # =============================== EMMANUEL ======================================
-    
-    
-    
-    # =============================== CATALINA ======================================
-    
-    
-    
-    # =============================== JUAN ESTEBAN ==================================
-    
     
     
     return None
@@ -219,23 +162,6 @@ def backtracking_mrv_lcv(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     - Use csp.get_num_conflicts(var, value, assignment) to count how many values would be ruled out for neighbors if var=value is assigned.
     """
     # TODO: Implement your code here (BONUS)
-      
-    # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-    # =============================== MICHELLE ======================================
-    
-    
-    
-    # =============================== EMMANUEL ======================================
-    
-    
-    
-    # =============================== CATALINA ======================================
-    
-    
-    
-    # =============================== JUAN ESTEBAN ==================================
-    
     
     
     return None

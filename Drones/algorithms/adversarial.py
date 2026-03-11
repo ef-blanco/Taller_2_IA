@@ -66,22 +66,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         - Return the ACTION (not the value) that maximizes the minimax value for the drone.
         """
         # TODO: Implement your code here
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
         
         
         return None
@@ -109,22 +93,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         - Pass alpha and beta through the recursive calls.
         """
         # TODO: Implement your code here (BONUS)
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
         
         
         return None
@@ -160,22 +128,5 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         - self.prob is set via the constructor argument prob.
         """
         # TODO: Implement your code here
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
-        
         
         return None
