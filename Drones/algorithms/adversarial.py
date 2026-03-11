@@ -67,9 +67,72 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         # TODO: Implement your code here
         
+        profundidad_init = self.depth
+        numAgentes = state.get_num_agents()
         
-        return None
-
+        best_value = float('-inf')
+        best_action = None
+        
+        for action in state.get_legal_actions(0):
+            sucesor = state.generate_successor(0,action)
+            
+            value = self.minimax(sucesor,(0+1)%numAgentes,profundidad_init)
+            
+            if value > best_value:
+                best_value = value
+                best_action = action
+        
+        return best_action
+    # Basado en el algoritmo del libro para MiniMax
+    
+    def minimax(self,state:GameState, agent_index:int, depth:int) -> int:
+        
+        if state.is_win() or state.is_lose() or depth == 0:
+            return self.evaluation_function(state)
+        
+        if agent_index == 0:
+            value, _ = self.max_value(state,agent_index,depth)
+            return value
+        else:
+            value, _ = self.min_value(state,agent_index,depth)
+            return value        
+    
+    def max_value(self, state:GameState, agent_index:int,depth:int) -> int:
+        actions = state.get_legal_actions(agent_index)
+        if not actions:
+            return self.evaluation_function(state)
+        
+        v= float('-inf')
+        new_depth = depth
+        next_agent = (agent_index+1)%state.get_num_agents()
+        if next_agent == 0:
+                new_depth = depth - 1
+                
+        for action in state.get_legal_actions(agent_index):
+            
+            v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
+            if v2 > v:
+                v = v2
+        
+        return v
+    
+    def min_value(self, state:GameState, agent_index:int,depth:int) -> int:
+        actions = state.get_legal_actions(agent_index)
+        if not actions:
+            return self.evaluation_function(state)
+        
+        v = float('inf')
+        new_depth = depth
+        next_agent = (agent_index+1)%state.get_num_agents()
+        if next_agent == 0:
+            new_depth = depth - 1
+        for action in state.get_legal_actions(agent_index):
+            
+            v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
+            if v2 < v:
+                v = v2
+        
+        return v
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
