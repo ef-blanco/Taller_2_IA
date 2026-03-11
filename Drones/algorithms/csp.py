@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from algorithms.problems_csp import DroneAssignmentCSP
 
 # Este método maneja los backtracks de backtracking_search
-def backtrack(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict[str,str] | None:
+def backtrack(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts)
+        print("Número de asignaciones intentadas: ",attempts[0])
         return asignacion
       
       # Obtenemos la primera variable sin asignar
@@ -16,7 +16,8 @@ def backtrack(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict[str
       
       # Vamos probando los distintos valor asignables a la variable escogida
       for valor in csp.domains[variable]:
-        
+        # Le sumamos uno a los backtracks si el valor no nos sirvió  
+        attempts[0]+=1
         # Primero vemos si el valor es consistente con las restricciones
         if csp.is_consistent(variable,valor,asignacion):
           
@@ -33,8 +34,6 @@ def backtrack(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict[str
           # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
           csp.unassign(variable,asignacion)
           
-        # Le sumamos uno a los backtracks si el valor no nos sirvió  
-        attempts+=1
         
       # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
       return None
@@ -60,24 +59,24 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     # TODO: Implement your code here
     
     asignacion = {}
-    attempts = 0
+    attempts = [0]
     
     return backtrack(csp,asignacion,attempts)
 
 # Este método maneja los backtracks de backtracking_fc
 
-def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict[str,str] | None:
+def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts)
+        print("Número de asignaciones intentadas: ",attempts[0])
         return asignacion
       
       # Obtenemos la primera variables sin asignar
       variable = csp.get_unassigned_variables(asignacion)[0]
        
       # Vamos probando con distintos valores
-      for valor in csp.domains[variable]:
+      for valor in list(csp.domains[variable]):
         # Le sumamos uno a los backtracks si el valor no nos sirvió
-        attempts+=1
+        attempts[0]+=1
         # Primero vemos si el valor es consistente con las restricciones
         if csp.is_consistent(variable,valor,asignacion):
           
@@ -93,15 +92,16 @@ def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> 
           for vecino in csp.get_neighbors(variable):
             
             if vecino not in asignacion.keys():
+              
+              # Eliminamos los valores inválidos de los vecinos
+              for valor_v in list(csp.domains[vecino]):
+                if not csp.is_consistent(vecino,valor_v,asignacion):
+                  csp.domains[vecino].remove(valor_v)
+                  
               # Revisamos si alguno de los vecinos ya no tiene valores consistentes
               if len(csp.domains[vecino]) == 0:
                 volver = True
                 break
-              
-              # Eliminamos los valores inválidos de los vecinos
-              for valor in csp.domains[vecino]:
-                if not csp.is_consistent(vecino,valor,asignacion):
-                  csp.domains[vecino].remove(valor)
             
           
           if not volver:
@@ -133,15 +133,15 @@ def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     # TODO: Implement your code here
     
     asignacion = {}
-    attempts = 0
+    attempts = [0]
     
     return backtrack_plus_fc(csp,asignacion,attempts)
 
 
 # Este método maneja los backtracks de backtracking_search
-def backtrack_AC3(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict[str,str] | None:
+def backtrack_AC3(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts)
+        print("Número de asignaciones intentadas: ",attempts[0])
         return asignacion
       
       # Obtenemos la primera variable sin asignar
@@ -149,7 +149,7 @@ def backtrack_AC3(csp:DroneAssignmentCSP, asignacion:dict, attempts:int) -> dict
       
       # Vamos probando los distintos valor asignables a la variable escogida
       for valor in list(csp.domains[variable]):
-        attempts+=1
+        attempts[0]+=1
         # Primero vemos si el valor es consistente con las restricciones
         if csp.is_consistent(variable,valor,asignacion):
           
@@ -194,7 +194,7 @@ def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
     # TODO: Implement your code here
     asignacion = {}
-    attempts = 0
+    attempts = [0]
     cola = [(xi, xj) for xi in csp.variables for xj in csp.get_neighbors(xi)]
     
     if not ac_3(csp, cola, asignacion):
