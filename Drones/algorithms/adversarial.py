@@ -49,7 +49,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Minimax agent for the drone (MAX) vs hunters (MIN) game.
     """
-
+    
     def get_action(self, state: GameState) -> Directions | None:
         """
         Returns the best action for the drone using minimax.
@@ -66,15 +66,22 @@ class MinimaxAgent(MultiAgentSearchAgent):
         - Return the ACTION (not the value) that maximizes the minimax value for the drone.
         """
         # TODO: Implement your code here
+        if state.is_win() or state.is_lose():
+            return None
         
         profundidad_init = self.depth
         numAgentes = state.get_num_agents()
         
         best_value = float('-inf')
         best_action = None
-        
+        actions = state.get_legal_actions(0)
+        if not actions:
+            return None
         for action in state.get_legal_actions(0):
             sucesor = state.generate_successor(0,action)
+            
+            if sucesor.is_win():
+                return action
             
             value = self.minimax(sucesor,(0+1)%numAgentes,profundidad_init)
             
@@ -91,10 +98,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return self.evaluation_function(state)
         
         if agent_index == 0:
-            value, _ = self.max_value(state,agent_index,depth)
+            value = self.max_value(state,agent_index,depth)
             return value
         else:
-            value, _ = self.min_value(state,agent_index,depth)
+            value = self.min_value(state,agent_index,depth)
             return value        
     
     def max_value(self, state:GameState, agent_index:int,depth:int) -> int:
@@ -108,7 +115,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if next_agent == 0:
                 new_depth = depth - 1
                 
-        for action in state.get_legal_actions(agent_index):
+        for action in actions:
             
             v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
             if v2 > v:
@@ -126,7 +133,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         next_agent = (agent_index+1)%state.get_num_agents()
         if next_agent == 0:
             new_depth = depth - 1
-        for action in state.get_legal_actions(agent_index):
+        for action in actions:
             
             v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
             if v2 < v:
