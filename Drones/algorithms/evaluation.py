@@ -80,13 +80,14 @@ def evaluation_function(state: GameState) -> float:
           mas_cercana = i
         
         i+=1
+      
+      # Ahora miramos el costo de la entrega más cercana
+      cost_dijkstra, _ = dijkstra(state.get_layout(),dron_pos,pos_deliveries[mas_cercana])
         
     puntaje_distancias_entregas-= 5*mejor
     if len(pos_deliveries) == 1:
       new_score-= 40*mejor
-    
-    # Ahora miramos el costo de la entrega más cercana
-    cost_dijkstra, _ = dijkstra(state.get_layout(),dron_pos,pos_deliveries[mas_cercana])
+      
     puntaje_distancias_entregas-= cost_dijkstra
     
     
@@ -117,7 +118,7 @@ def evaluation_function(state: GameState) -> float:
     
     new_score+=puntaje_dist_hunters
     #bonus por puntaje anterior
-    if past_score > 0:
-      new_score+= past_score*0.5
+    # if past_score > 0:
+    #   new_score+= past_score*0.5
     
-    return new_score
+    return max(-1000, min(1000, new_score))

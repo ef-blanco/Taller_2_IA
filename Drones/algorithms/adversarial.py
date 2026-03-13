@@ -68,78 +68,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # TODO: Implement your code here
         if state.is_win() or state.is_lose():
             return None
-        
-        profundidad_init = self.depth
+        contador = {"Decisión":0}
+        profundidadInicial = self.depth
+        evaluacionFinal = self.evaluation_function
         numAgentes = state.get_num_agents()
-        
-        best_value = float('-inf')
-        best_action = None
-        actions = state.get_legal_actions(0)
-        if not actions:
+        def minMaxRecursivo(estado, agente, d):
+            contador["Decisión"] += 1
+            if d==0 or estado.is_win() or estado.is_lose():
+                return evaluacionFinal(estado)
+            proximo = (agente + 1) % numAgentes
+            nuevaProfundidad = d - 1 if proximo == 0 else d
+            acciones = estado.get_legal_actions(agente)
+
+            if not acciones:
+                return evaluacionFinal(estado)
+            
+            sucesoresEstados = [minMaxRecursivo(estado.generate_successor(agente, accion), proximo, nuevaProfundidad) for accion in acciones]
+            return max(sucesoresEstados) if agente == 0 else min(sucesoresEstados)
+            
+        accionesDron = state.get_legal_actions(0)
+        if not accionesDron:
             return None
-        for action in state.get_legal_actions(0):
-            sucesor = state.generate_successor(0,action)
-            
+        
+        mejorValor = -float('inf')
+        mejorAccion = None
+
+        for accion in accionesDron:
+            sucesor = state.generate_successor(0, accion)
             if sucesor.is_win():
-                return action
+                return accion
+            print(sucesor)
             
-            value = self.minimax(sucesor,(0+1)%numAgentes,profundidad_init)
+            valorActual = minMaxRecursivo(sucesor, 1, profundidadInicial)
             
-            if value > best_value:
-                best_value = value
-                best_action = action
-        
-        return best_action
-    # Basado en el algoritmo del libro para MiniMax
-    
-    def minimax(self,state:GameState, agent_index:int, depth:int) -> int:
-        
-        if state.is_win() or state.is_lose() or depth == 0:
-            return self.evaluation_function(state)
-        
-        if agent_index == 0:
-            value = self.max_value(state,agent_index,depth)
-            return value
-        else:
-            value = self.min_value(state,agent_index,depth)
-            return value        
-    
-    def max_value(self, state:GameState, agent_index:int,depth:int) -> int:
-        actions = state.get_legal_actions(agent_index)
-        if not actions:
-            return self.evaluation_function(state)
-        
-        v= float('-inf')
-        new_depth = depth
-        next_agent = (agent_index+1)%state.get_num_agents()
-        if next_agent == 0:
-                new_depth = depth - 1
-                
-        for action in actions:
-            
-            v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
-            if v2 > v:
-                v = v2
-        
-        return v
-    
-    def min_value(self, state:GameState, agent_index:int,depth:int) -> int:
-        actions = state.get_legal_actions(agent_index)
-        if not actions:
-            return self.evaluation_function(state)
-        
-        v = float('inf')
-        new_depth = depth
-        next_agent = (agent_index+1)%state.get_num_agents()
-        if next_agent == 0:
-            new_depth = depth - 1
-        for action in actions:
-            
-            v2 = self.minimax(state.generate_successor(agent_index,action),next_agent,new_depth)
-            if v2 < v:
-                v = v2
-        
-        return v
+            if valorActual > mejorValor:
+                mejorValor = valorActual
+                mejorAccion = accion
+
+        return mejorAccion
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
