@@ -49,7 +49,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Minimax agent for the drone (MAX) vs hunters (MIN) game.
     """
-
+    
     def get_action(self, state: GameState) -> Directions | None:
         """
         Returns the best action for the drone using minimax.
@@ -66,26 +66,46 @@ class MinimaxAgent(MultiAgentSearchAgent):
         - Return the ACTION (not the value) that maximizes the minimax value for the drone.
         """
         # TODO: Implement your code here
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
-        
-        
-        return None
+        if state.is_win() or state.is_lose():
+            return None
+        contador = {"Decisión":0}
+        profundidadInicial = self.depth
+        evaluacionFinal = self.evaluation_function
+        numAgentes = state.get_num_agents()
+        def minMaxRecursivo(estado, agente, d):
+            contador["Decisión"] += 1
+            if d==0 or estado.is_win() or estado.is_lose():
+                return evaluacionFinal(estado)
+            proximo = (agente + 1) % numAgentes
+            nuevaProfundidad = d - 1 if proximo == 0 else d
+            acciones = estado.get_legal_actions(agente)
 
+            if not acciones:
+                return evaluacionFinal(estado)
+            
+            sucesoresEstados = [minMaxRecursivo(estado.generate_successor(agente, accion), proximo, nuevaProfundidad) for accion in acciones]
+            return max(sucesoresEstados) if agente == 0 else min(sucesoresEstados)
+            
+        accionesDron = state.get_legal_actions(0)
+        if not accionesDron:
+            return None
+        
+        mejorValor = -float('inf')
+        mejorAccion = None
+
+        for accion in accionesDron:
+            sucesor = state.generate_successor(0, accion)
+            if sucesor.is_win():
+                return accion
+            print(sucesor)
+            
+            valorActual = minMaxRecursivo(sucesor, 1, profundidadInicial)
+            
+            if valorActual > mejorValor:
+                mejorValor = valorActual
+                mejorAccion = accion
+
+        return mejorAccion
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -109,22 +129,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         - Pass alpha and beta through the recursive calls.
         """
         # TODO: Implement your code here (BONUS)
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
         
         
         return None
@@ -160,22 +164,5 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         - self.prob is set via the constructor argument prob.
         """
         # TODO: Implement your code here
-          
-        # Voy a denotar con comentarios espacios para que cada uno trabaje por si alguien quiere hacer múltiples puntos y luego comparar
-    
-        # =============================== MICHELLE ======================================
-        
-        
-    
-        # =============================== EMMANUEL ======================================
-        
-        
-    
-        # =============================== CATALINA ======================================
-        
-        
-    
-        # =============================== JUAN ESTEBAN ==================================
-        
         
         return None
