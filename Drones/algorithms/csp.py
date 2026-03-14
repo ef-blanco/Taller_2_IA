@@ -257,5 +257,53 @@ def backtracking_mrv_lcv(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
     # TODO: Implement your code here (BONUS)
     
-    
-    return None
+    contador = {"Decisión":0}
+
+    def get_mrv_variable(assignment):
+        
+        unassigned = csp.get_unassigned_variables(assignment)
+        return min(unassigned, key=lambda v: (len(csp.domains[v]), -len(csp.get_neighbors(v))))
+
+    def get_lcv_ordered_values(var, assignment):
+        return sorted(csp.domains[var], key=lambda val: csp.get_num_conflicts(var, val, assignment))
+
+    def solucion_mrv_lcv(assignment):
+        if csp.is_complete(assignment):
+            print(f"🐮🌿 [MRV+LCV] Total de asignaciones: {contador['Decisión']}")
+            return assignment
+        
+        var = get_mrv_variable(assignment)
+
+        for valor in get_lcv_ordered_values(var, assignment):
+            contador["Decisión"] += 1
+            if csp.is_consistent(var, valor, assignment):
+                csp.assign(var, valor, assignment)
+                old_domains = {v: list(csp.domains[v]) for v in csp.domains}
+                
+                poda_exitosa = True
+                for vecino in csp.get_neighbors(var):
+                    if vecino not in assignment:
+                        for v_val in list(csp.domains[vecino]):
+                            if not csp.is_consistent(vecino, v_val, assignment):
+                                csp.domains[vecino].remove(v_val)
+                        if not csp.domains[vecino]:
+                            poda_exitosa = False
+                            break
+                
+                if poda_exitosa:
+                    resultado = solucion_mrv_lcv(assignment)
+                    if resultado is not None:
+                        return resultado
+
+                csp.domains = old_domains
+                csp.unassign(var, assignment)
+            return None
+    final_assignment = solucion_mrv_lcv({})
+
+    if final_assignment:
+        print(f"Sí hay solución 🐮🌿")
+    else:
+        print(f"No hay solución 🐮🥩 ")
+        print(f"Total de asignaciones intentadas: {contador['Decisión']}")
+            
+    return final_assignment
