@@ -5,38 +5,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from algorithms.problems_csp import DroneAssignmentCSP
 
-# Este método maneja los backtracks de backtracking_search
-def backtrack(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
-      if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts[0])
-        return asignacion
-      
-      # Obtenemos la primera variable sin asignar
-      variable = csp.get_unassigned_variables(asignacion)[0]
-      
-      # Vamos probando los distintos valor asignables a la variable escogida
-      for valor in csp.domains[variable]:
-        # Le sumamos uno a los backtracks si el valor no nos sirvió  
-        attempts[0]+=1
-        # Primero vemos si el valor es consistente con las restricciones
-        if csp.is_consistent(variable,valor,asignacion):
-          
-          # Si es consistente asignamos el valor y ahora miramos si nos lleva a un buen resultado
-          csp.assign(variable,valor,asignacion)
-          
-          # Se manda a la recursión para asignar valores a las demás variables
-          resultado = backtrack(csp,asignacion,attempts)
-          
-          # Si el resultado nos dio una respuesta la retornamos
-          if resultado is not None:
-            return resultado
-          
-          # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
-          csp.unassign(variable,asignacion)
-          
-        
-      # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
-      return None
 
 def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
@@ -57,65 +25,29 @@ def backtracking_search(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     Artificial Intelligence: A Modern Approach (4th Edition) by Russell and Norvig, Chapter 5: Constraint Satisfaction Problems
     """
     # TODO: Implement your code here
+    #Pongo este contador para poder mostrar estadísticas chéveres para el informe:D
+    contador = {"Decisión":0}
     
-    asignacion = {}
-    attempts = [0]
-    
-    return backtrack(csp,asignacion,attempts)
+    #Pongo esto aquí para hacerlo recursivo :p
+    def solucion(diccionario):
+        if csp.is_complete(diccionario):
+            print(f"🐮🌿[Backtracking Simple] Total de asignaciones: {contador['Decisión']}")
+            return diccionario
+        seleccionada = csp.get_unassigned_variables(diccionario)[0]
 
-# Este método maneja los backtracks de backtracking_fc
+        for valor in csp.domains[seleccionada]:
+            contador["Decisión"] += 1
+            if csp.is_consistent(seleccionada, valor, diccionario):
+                csp.assign(seleccionada,valor, diccionario)
+                #aquí nos ponemos recursivos jiji
+                resultado = solucion(diccionario)
+                if resultado is not None:
+                    return resultado
+                csp.unassign(seleccionada, diccionario)
 
-def backtrack_plus_fc(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
-      if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts[0])
-        return asignacion
-      
-      # Obtenemos la primera variables sin asignar
-      variable = csp.get_unassigned_variables(asignacion)[0]
-       
-      # Vamos probando con distintos valores
-      for valor in list(csp.domains[variable]):
-        # Le sumamos uno a los backtracks si el valor no nos sirvió
-        attempts[0]+=1
-        # Primero vemos si el valor es consistente con las restricciones
-        if csp.is_consistent(variable,valor,asignacion):
-          
-          # Si es consistente asignamos el valor y ahora miramos si nos lleva a un buen resultado
-          csp.assign(variable,valor,asignacion)
-          
-          # Guardamos los dominios anteriores
-          viejos_dominios = {v: list(csp.domains[v]) for v in csp.domains}
+        return None
+    return solucion({})
 
-          
-          volver = False
-          # Pero ahora modificamos los dominios de acuerdo a la asignación hecha
-          for vecino in csp.get_neighbors(variable):
-            
-            if vecino not in asignacion.keys():
-              
-              # Eliminamos los valores inválidos de los vecinos
-              for valor_v in list(csp.domains[vecino]):
-                if not csp.is_consistent(vecino,valor_v,asignacion):
-                  csp.domains[vecino].remove(valor_v)
-                  
-              # Revisamos si alguno de los vecinos ya no tiene valores consistentes
-              if len(csp.domains[vecino]) == 0:
-                volver = True
-                break
-            
-          
-          if not volver:
-            resultado = backtrack_plus_fc(csp,asignacion,attempts)
-            # Si el resultado nos dio una respuesta la retornamos
-            if resultado is not None:
-              return resultado
-            
-          # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
-          csp.unassign(variable,asignacion)
-          csp.domains = viejos_dominios
-       
-      # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
-      return None
 
 
 def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
@@ -131,50 +63,42 @@ def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     - Forward checking reduces the search space by detecting failures earlier than basic backtracking.
     """
     # TODO: Implement your code here
-    
-    asignacion = {}
-    attempts = [0]
-    
-    return backtrack_plus_fc(csp,asignacion,attempts)
-
-
-# Este método maneja los backtracks de backtracking_search
-def backtrack_AC3(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
-      if csp.is_complete(asignacion):
+    contador = {"Decisión":0}
+    def solucion_fc(diccionario):
+        if csp.is_complete(diccionario):
+            print(f"🐮🌿[Forward Checking] Total de asignaciones: {contador['Decisión']}")
+            return diccionario
         
-        return asignacion
-      
-      # Obtenemos la primera variable sin asignar
-      variable = csp.get_unassigned_variables(asignacion)[0]
-      
-      # Vamos probando los distintos valor asignables a la variable escogida
-      for valor in list(csp.domains[variable]):
-        attempts[0]+=1
-        # Primero vemos si el valor es consistente con las restricciones
-        if csp.is_consistent(variable,valor,asignacion):
-          
-          # Si es consistente asignamos el valor y ahora miramos si nos lleva a un buen resultado
-          csp.assign(variable,valor,asignacion)
-          
-          dominios_antes = {v: list(csp.domains[v]) for v in csp.domains}
-          
-          csp.domains[variable] = [valor]
-          cola = [(neighbor, variable) for neighbor in csp.get_neighbors(variable) if neighbor not in asignacion]
-          
-          if ac_3(csp,cola,asignacion):
-            # Se manda a la recursión para asignar valores a las demás variables
-            resultado = backtrack_AC3(csp,asignacion,attempts)
-            
-            # Si el resultado nos dio una respuesta la retornamos
-            if resultado is not None:
-              return resultado
-          
-          # Si el resultado no nos lleva a una solución volvemos atrás y asignamos otro valor
-          csp.domains = dominios_antes
-          csp.unassign(variable,asignacion)
-        
-      # Si ninguno de los valores no sirvió llegamos a un dead end retornamos None para indicarle al backtrack ir por otro camino
-      return None
+        seleccionada = csp.get_unassigned_variables(diccionario)[0]
+
+        for valor in csp.domains[seleccionada]:
+            contador["Decisión"] += 1
+            if csp.is_consistent(seleccionada, valor, diccionario):
+                csp.assign(seleccionada, valor, diccionario)
+
+                viejos_dominios = {v: list(csp.domains[v]) for v in csp.domains}
+
+                poda_exitosa = True
+                for vecino in csp.get_neighbors(seleccionada):
+                    if vecino not in diccionario:
+                        for v_valor in list(csp.domains[vecino]):
+                            if not csp.is_consistent(vecino, v_valor, diccionario):
+                                csp.domains[vecino].remove(v_valor)
+                        
+                        if not csp.domains[vecino]:
+                            poda_exitosa = False
+                            break
+                if poda_exitosa:
+                    resultado = solucion_fc(diccionario)
+                    if resultado is not None:
+                        return resultado
+
+                csp.domains = viejos_dominios
+                csp.unassign(seleccionada, diccionario)
+
+        return None
+    return solucion_fc({})
+
 
 def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
@@ -193,61 +117,60 @@ def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
       - a backtrack function that integrates AC-3 into the search process.
     """
     # TODO: Implement your code here
-    asignacion = {}
-    attempts = [0]
-    cola = [(xi, xj) for xi in csp.variables for xj in csp.get_neighbors(xi)]
-    
-    if not ac_3(csp, cola, asignacion):
-      print("Número de asignaciones intentadas:", attempts[0])
-      return None
+    contador = {"Decisión":0}
+    def ac3(assignment, queue):
+        """Algoritmo AC-3 para mantener consistencia de arco."""
+        while queue:
+            (xi, xj) = queue.pop(0)
+            revised = False
+            for x_val in list(csp.domains[xi]):
+                if not any(csp.is_consistent(xi, x_val, {**assignment, xj: y_val}) for y_val in csp.domains[xj]):
+                    csp.domains[xi].remove(x_val)
+                    revised = True
+            
+            if revised:
+                if not csp.domains[xi]:
+                    return False
+                for xk in csp.get_neighbors(xi):
+                    if xk != xj:
+                        queue.append((xk, xi))
+        return True
 
-    resultado = backtrack_AC3(csp, asignacion, attempts)
+    def solucion_ac3(assignment):
+        if csp.is_complete(assignment):
+            print(f"🐮🌿 [AC-3] Total de asignaciones: {contador['Decisión']}")
+            return assignment
+        
+        var = csp.get_unassigned_variables(assignment)[0]
 
-    print("Número de asignaciones intentadas:", attempts[0])
+        for valor in csp.domains[var]:
+            contador["Decisión"] += 1
+            if csp.is_consistent(var, valor, assignment):
+                csp.assign(var, valor, assignment)
+                old_domains = {v: list(csp.domains[v]) for v in csp.domains}
+                
+                csp.domains[var] = [valor]
+                queue = [(neighbor, var) for neighbor in csp.get_neighbors(var) if neighbor not in assignment]
+                
+                if ac3(assignment, queue):
+                    resultado = solucion_ac3(assignment)
+                    if resultado is not None:
+                        return resultado
 
-    return resultado
+                csp.domains = old_domains
+                csp.unassign(var, assignment)
+        return None
+
+    initial_queue = [(v, n) for v in csp.domains for n in csp.get_neighbors(v)]
+    if not ac3({}, initial_queue):
+        print(f"[AC-3] Falló en consistencia inicial.")
+        return None
+        
+    return solucion_ac3({})
 
 
-# implementación de AC-3 basada en el seudoalgoritmo del libro
-def ac_3(csp:DroneAssignmentCSP, queue:list, asignacion:dict) -> bool:
-  
-  while queue:
-    
-    #Se obtienen las variables que hacen parte de arco
-    x_i, x_j = queue.pop(0)
-    
-    revisado = False
-    for valor_i in list(csp.domains[x_i]):
-      
-      hay_valor = False
-      asignacion_temp = asignacion.copy()
-      asignacion_temp[x_i] = valor_i
-      
-      for valor_j in csp.domains[x_j]:
-        # Revisamos si las asignaciones nos sirven, si hay consistencia en el arco
-        if (csp.is_consistent(x_j,valor_j,asignacion_temp)and
-            csp.is_consistent(x_i,valor_i,asignacion_temp)):
-          hay_valor = True
-          break
-      
-      
-      # Si no hay valor de x_j valido, quitamos el valor que intentamos usar en x_i de su dominio
-      if not hay_valor:
-        csp.domains[x_i].remove(valor_i)
-        revisado = True
-    
-    # Ya habiendo revisado el arco vemos si nos quedaron valores para x_i
-    if revisado:
-      # Si no hay valores que pueda tomar x_i entonces retornamos False para hacer un backtrack en la función principal
-      if not csp.domains[x_i]:
-        return False
-      # Si hay valores, seguimos validando otros arcos
-      for x_k in csp.get_neighbors(x_i):
-        if x_k != x_j:
-          queue.append((x_k,x_i))
-          
-  return True
-  
+    return None
+
 
 def backtracking_mrv_lcv(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     """
@@ -262,7 +185,6 @@ def backtracking_mrv_lcv(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     - Use csp.get_num_conflicts(var, value, assignment) to count how many values would be ruled out for neighbors if var=value is assigned.
     """
     # TODO: Implement your code here (BONUS)
-    
     contador = {"Decisión":0}
 
     def get_mrv_variable(assignment):
@@ -312,4 +234,4 @@ def backtracking_mrv_lcv(csp: DroneAssignmentCSP) -> dict[str, str] | None:
         print(f"No hay solución 🐮🥩 ")
         print(f"Total de asignaciones intentadas: {contador['Decisión']}")
             
-    return final_assignment
+    return final_assignment    
