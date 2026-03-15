@@ -45,68 +45,6 @@ class RandomAgent(MultiAgentSearchAgent):
         return random.choice(legal_actions) if legal_actions else None
 
 
-class MinimaxAgent(MultiAgentSearchAgent):
-    """
-    Minimax agent for the drone (MAX) vs hunters (MIN) game.
-    """
-    
-    def get_action(self, state: GameState) -> Directions | None:
-        """
-        Returns the best action for the drone using minimax.
-
-        Tips:
-        - The game tree alternates: drone (MAX) -> hunter1 (MIN) -> hunter2 (MIN) -> ... -> drone (MAX) -> ...
-        - Use self.depth to control the search depth. depth=1 means the drone moves once and each hunter moves once.
-        - Use state.get_legal_actions(agent_index) to get legal actions for a specific agent.
-        - Use state.generate_successor(agent_index, action) to get the successor state after an action.
-        - Use state.is_win() and state.is_lose() to check terminal states.
-        - Use state.get_num_agents() to get the total number of agents.
-        - Use self.evaluation_function(state) to evaluate leaf/terminal states.
-        - The next agent is (agent_index + 1) % num_agents. Depth decreases after all agents have moved (full ply).
-        - Return the ACTION (not the value) that maximizes the minimax value for the drone.
-        """
-        # TODO: Implement your code here
-        if state.is_win() or state.is_lose():
-            return None
-        contador = {"Decisión":0}
-        profundidadInicial = self.depth
-        evaluacionFinal = self.evaluation_function
-        numAgentes = state.get_num_agents()
-        def minMaxRecursivo(estado, agente, d):
-            contador["Decisión"] += 1
-            if d==0 or estado.is_win() or estado.is_lose():
-                return evaluacionFinal(estado)
-            proximo = (agente + 1) % numAgentes
-            nuevaProfundidad = d - 1 if proximo == 0 else d
-            acciones = estado.get_legal_actions(agente)
-
-            if not acciones:
-                return evaluacionFinal(estado)
-            
-            sucesoresEstados = [minMaxRecursivo(estado.generate_successor(agente, accion), proximo, nuevaProfundidad) for accion in acciones]
-            return max(sucesoresEstados) if agente == 0 else min(sucesoresEstados)
-            
-        accionesDron = state.get_legal_actions(0)
-        if not accionesDron:
-            return None
-        
-        mejorValor = -float('inf')
-        mejorAccion = None
-
-        for accion in accionesDron:
-            sucesor = state.generate_successor(0, accion)
-            if sucesor.is_win():
-                return accion
-            print(sucesor)
-            
-            valorActual = minMaxRecursivo(sucesor, 1, profundidadInicial)
-            
-            if valorActual > mejorValor:
-                mejorValor = valorActual
-                mejorAccion = accion
-
-        return mejorAccion
-
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Alpha-Beta pruning agent. Same as Minimax but with alpha-beta pruning.

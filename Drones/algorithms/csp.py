@@ -141,7 +141,7 @@ def backtracking_fc(csp: DroneAssignmentCSP) -> dict[str, str] | None:
 # Este método maneja los backtracks de backtracking_search
 def backtrack_AC3(csp:DroneAssignmentCSP, asignacion:dict, attempts:list) -> dict[str,str] | None:
       if csp.is_complete(asignacion):
-        print("Número de asignaciones intentadas: ",attempts[0])
+        
         return asignacion
       
       # Obtenemos la primera variable sin asignar
@@ -198,9 +198,15 @@ def backtracking_ac3(csp: DroneAssignmentCSP) -> dict[str, str] | None:
     cola = [(xi, xj) for xi in csp.variables for xj in csp.get_neighbors(xi)]
     
     if not ac_3(csp, cola, asignacion):
-        return None
-    
-    return backtrack_AC3(csp,asignacion,attempts)
+      print("Número de asignaciones intentadas:", attempts[0])
+      return None
+
+    resultado = backtrack_AC3(csp, asignacion, attempts)
+
+    print("Número de asignaciones intentadas:", attempts[0])
+
+    return resultado
+
 
 # implementación de AC-3 basada en el seudoalgoritmo del libro
 def ac_3(csp:DroneAssignmentCSP, queue:list, asignacion:dict) -> bool:
