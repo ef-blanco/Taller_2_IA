@@ -117,8 +117,5 @@ def evaluation_function(state: GameState) -> float:
       
     
     new_score+=puntaje_dist_hunters
-    #bonus por puntaje anterior
-    # if past_score > 0:
-    #   new_score+= past_score*0.5
     
     return max(-1000, min(1000, new_score))
